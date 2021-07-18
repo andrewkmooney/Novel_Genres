@@ -3,7 +3,7 @@ import numpy as np
 import pandas as pd
 from PIL import Image
 
-image = Image.open('sci_fi_scape.jpeg')
+image = Image.open('images/sci_fi_scape.jpeg')
 
 st.image(image)
 
