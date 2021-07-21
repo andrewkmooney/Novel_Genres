@@ -899,7 +899,7 @@ def find_most_similar(description, number=10, year=1900, detail=None):
     
     df_final = df.sort_values(by=['Similarity'], ascending=False)
     
-    df_final.drop(columns=['TF_Vector','Spacy_Vector'],inplace=True)
+    df_final.drop(columns=['TF_Vector'],inplace=True)
     
     if detail == None:
         return df_final.head(number)
