@@ -5,7 +5,7 @@
 
 ## Objective
 
-This project is for all you writers out there. As someone who has tried (unsuccessfully) to acquire a literary agent, I have learned a great deal about how import industry knowledge is to new authors looking to get published. Using a dataset of 11000 science fiction books and Natural Language Processing, I built a tool that takes in a book blurb, predicts its Science Fiction subgenre, its intended age demographic and the top ten similar science fiction novels. The ultimate goal is to publish this as a free tool to help neophyte authors to shift from writing as a hobby to writing as a profession.
+This project is for all you writers out there. As someone who has tried (unsuccessfully) to acquire a literary agent, I have learned a great deal about how important industry knowledge is to new authors looking to get published. Using a dataset of 11000 science fiction books and Natural Language Processing, I built a tool that takes in a book blurb and then predicts its Science Fiction subgenre, its intended age demographic, and also provides the top ten similar science fiction novels. The ultimate goal is to publish this as a free tool to help neophyte authors to shift from writing as a hobby to writing as a profession.
 
 ## The Data
 I used the [Science Fiction Books Kaggle dataset](https://www.kaggle.com/tanguypledel/science-fiction-books-subgenres) which has around 11k unique rows detailing the novel's title, author, year of publication, Goodread scores and, crucially, its book description. Book descriptions are a good target for NLP analysis because they have typically been edited and tested by marketing professionals based on industry trends. Therefore, there is much less noise than in, say, a series of tweets. They contain full sentences, correct syntax, and common themes.
@@ -50,7 +50,7 @@ The first model identifies the target demographic for the book. This is a multi-
 
 ### Model 2 - Sub-Genre - Multi-Label
 
-The second model identifies the many possible sub-genres the novel could belong to. These are not distinct categories, so, in theory, a novel could belong to all 15 sub genre. To measure the accuracy of this model I used a blend of macro and micro scores. Overall accuracy was determined by minimizing the Hamming Loss score, which measures the accuracy of each individual label. My final model had a Hamming loss of .16 using a Random Forest classifier
+The second model identifies the many possible sub-genres the novel could belong to. These are not distinct categories, so, in theory, a novel could belong to all 15 sub-genres. To measure the accuracy of this model I used a blend of macro and micro scores. Overall accuracy was determined by minimizing the Hamming Loss score, which measures the accuracy of each individual label. My final model had a Hamming loss of .167 on the Holdout dataset using a Random Forest classifier
 
 ![Genre_Scores](images/Genre_Scores.png)
 
@@ -64,10 +64,23 @@ Using this information, authors can refine their book descriptions by using spec
 
 ## Next Steps
 
-he core dataset is comprised only of Science Fiction books, but, with more data from other genres, we could build different models for each genre as well as expand our similarity database to further aid authors in exploring other agents.
+The core dataset is comprised only of Science Fiction books, but, with more data from other genres, we could build different models for each major publishing genre as well as expand our similarity database to further aid authors in exploring other agents.
 
 Beyond that, this same methodology could be used to try to predict a novel's success based on its description, though that would require book sales data. This data definitely exists, but because it is so valuable to the publishing industry, it is supremely expensive.
 
 Lastly, this data does not include one crucial column: Agents. If we enriched the data with the agents who represent the books, we can start to see patterns in agent tastes and preferences. Again, finding that data can be a challenge/expensive, but it would increase the value of this tool immeasurably.
 
 I plan to continue working on this model by expanding the number of genres as well as the size of the overall dataset. If I can fold in direct agent information to create new insights, that would be the ultimate goal.
+
+## Resources:
+### Writing Resources
+- [How to Write a Query Letter](https://www.janefriedman.com/query-letters/)
+- [Determing Sci-Fi Sub-Genres](https://writersrelief.com/2011/07/11/determine-book-genre/)
+- [Writing a Science Fiction Cover Letter](https://writersrelief.com/2018/05/31/query-letter-genre-essentials-pitching-sci-fi-and-fantasy-novels-writers-relief/)
+
+### NLP Resources
+- [How SpaCy Words](https://spacy.io/usage/spacy-101)
+- [TF-IDF Vectorization - Towards Data Science Blog](https://towardsdatascience.com/text-vectorization-term-frequency-inverse-document-frequency-tfidf-5a3f9604da6d)
+- [Skip-Grams - Towards Data Science Blog](https://towardsdatascience.com/skip-gram-nlp-context-words-prediction-algorithm-5bbf34f84e0c)
+- [SpaCy Lemmatizer Documentation](https://spacy.io/api/lemmatizer)
+- [Multi-Label Classification Metrics - Towards Data Science Blog](https://towardsdatascience.com/journey-to-the-center-of-multi-label-classification-384c40229bff)

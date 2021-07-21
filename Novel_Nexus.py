@@ -95,7 +95,7 @@ def find_most_similar(description, number=10, year=1900, detail=None):
         year = df_final['Year_published'].iloc[detail]
         desc = df_final['Book_Description'].iloc[detail]
         
-        print(f'''
+        st.write(f'''
         Most similar #{detail+1}:
         
         Title: {title}   Author: {author}  Year: {year}
@@ -297,7 +297,7 @@ if add_selectbox == 'Genre Analysis':
 
         
 
-        books = find_most_similar(txt,year=start)
+        books = find_most_similar(txt,year=start, detail=1)
 
         st.write(books)
 
