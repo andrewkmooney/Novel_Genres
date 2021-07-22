@@ -13,19 +13,19 @@ import plotly.express as px
 from PIL import Image
 
 
-filename_1 = 'genre_model.sav'
-filename_2 = 'age_model.sav'
-filename_3 = 'genre_vectorizer.sav'
-filename_4 = 'age_vectorizer.sav'
+filename_1 = 'data/genre_model.sav'
+filename_2 = 'data/age_model.sav'
+filename_3 = 'data/genre_vectorizer.sav'
+filename_4 = 'data/age_vectorizer.sav'
 
 genre_vectorizer = pickle.load(open(filename_3, 'rb'))
 genre_model = pickle.load(open(filename_1, 'rb'))
 age_model = pickle.load(open(filename_2, 'rb'))
 age_vectorizer = pickle.load(open(filename_4, 'rb'))
 
-df_genre = pd.read_csv('vector_df.csv')
+df_genre = pd.read_csv('data/vector_df.csv')
 
-df_genre['TF_Vector'] = np.load('Book_Vectors.npy',allow_pickle=True)
+df_genre['TF_Vector'] = np.load('data/Book_Vectors.npy',allow_pickle=True)
 
 df_vectors = df_genre[[
     'Book_Title',
@@ -249,7 +249,7 @@ if add_selectbox == 'Genre Analysis':
 
     text_dict = {}
 
-    title = st.text_input('Title of Novel')
+    book_title = st.text_input('Title of Novel')
     txt = st.text_area('Text to analyze', height=300)
 
     processed = False
@@ -267,7 +267,7 @@ if add_selectbox == 'Genre Analysis':
         words = most_impactful_words(txt)
 
         text_dict[index] = {
-            'title': title,
+            'title': book_title,
             'vector': vector,
             'age': age_df,
             'genre': genre_df,
@@ -277,7 +277,7 @@ if add_selectbox == 'Genre Analysis':
     if processed == True:
 
         st.title(f'''
-            Data for {title}
+            Data for {book_title}
             ''')
         col1, col2 = st.beta_columns(2)
         with col1:
@@ -288,11 +288,9 @@ if add_selectbox == 'Genre Analysis':
             st.write(text_dict[index]['words'])
         st.subheader('Age Group Scores')
         st.write(text_dict[index]['age'])
-        st.subheader('Scores by Sub-Genre')
-        fig = px.bar(text_dict[index]['genre'], labels={'x':'Sub-Genre','y':'Score'})
+        fig = px.bar(text_dict[index]['genre'], title=f'Sub-Genre Scores for {book_title}', labels={'value':'Score','index':'Sub-Genre'})
         st.plotly_chart(fig)
-        st.subheader('Scores by Age Group')
-        fig = px.bar(text_dict[index]['age'], labels={'x':'Age Group','y':'Score'})
+        fig = px.bar(text_dict[index]['age'], title=f'Age Group Scores for {book_title}',labels={'index':'Age Group','value':'Score'})
         st.plotly_chart(fig)
 
         

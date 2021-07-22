@@ -1,16 +1,12 @@
 import pandas as pd
 import numpy as np
-import nltk
-import string
-import re
 from nltk.corpus import stopwords
 from nltk import FreqDist
 from wordcloud import WordCloud
 from sklearn.feature_extraction.text import TfidfVectorizer, CountVectorizer
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score, roc_auc_score, roc_curve, plot_confusion_matrix, hamming_loss
+from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score, roc_curve, plot_confusion_matrix, hamming_loss
 from sklearn.preprocessing import LabelEncoder, OneHotEncoder, StandardScaler
-from sklearn.metrics.pairwise import cosine_similarity
 import spacy
 import time
 import matplotlib.pyplot as plt
@@ -841,112 +837,3 @@ def age_group(x):
         return 'Young Adult'
     else:
         return 'Adult'
-
-def genre_process(x):
-    
-    '''
-    Takes the genre list from Goodreads for each row of the dataframe and then maps those genres to the 15 categories
-    that will be measured in the final model.
-    
-    Parameters
-    ----------
-    
-    x - Dataframe row of df_desc
-    
-    Returns
-    -------
-    
-    A set of unique genres out of the 15 subgenres measured in the final model.
-    '''
-    
-    new_genres = []
-    
-    for genre in x:
-        if genre != 'None':
-            new_genres.append(dict_one[genre])
-            new_genres.append(dict_two[genre])
-    
-    new_genre_set = set([y for y in new_genres if y==y and y not in ['Adult','Young Adult','Childrens']])
-    
-    return new_genre_set
-
-def find_most_similar(description, number=10, year=1900, detail=None):
-    
-    '''
-    Takes a book description, processes it into a vector and returns the most similar books based on the cosine
-    similarity of that vector to the other book descriptions. Can return single descriptions or a table of books.
-    
-    Parameters
-    ----------
-    
-    description - string - a book description that we want to analyze in the form of a string. May include \n, which will be replaced with blank spaces.
-    number - int - determines the number of rows returned in the final dataframe
-    year - int - restricts the comparisons to books published after a certain date
-    detail - None or int - if None is passed, the return will be a dataframe. If an integer is passed, the dataframe will return the details of that row of the returned dataframe
-    
-    Returns
-    -------
-    
-    A dataframe ordered by the cosine similarity of the book descriptions. If an integer is passed in 'detail'
-    then the return will be the dataframe as well as the book description of that row of the dataframe.
-    
-    '''
-    
-    df = df_vectors[df_vectors['Year_published'] >= year]
-    
-    vector = create_tf_vector(description, model='genre')
-    df['Similarity'] = df['TF_Vector'].map(lambda x: cosine_similarity(vector, x)[0][0])
-    
-    df_final = df.sort_values(by=['Similarity'], ascending=False)
-    
-    df_final.drop(columns=['TF_Vector'],inplace=True)
-    
-    if detail == None:
-        return df_final.head(number)
-    else:
-        title = df_final['Book_Title'].iloc[detail]
-        author = df_final['Author_Name'].iloc[detail]
-        year = df_final['Year_published'].iloc[detail]
-        desc = df_final['Book_Description'].iloc[detail]
-        
-        print(f'''
-        Most similar #{detail+1}:
-        
-        Title: {title}   Author: {author}  Year: {year}
-        
-        {desc}
-        ''')
-        return df_final
-
-def most_impactful_words(description, num=None):
-    
-    '''
-    Finds the most impactful words in a description. It vectorizes the description and then sorts the words in terms
-    of vector magnitude.
-    
-    Parameters
-    ----------
-    
-    description - string - the book description that you would like to analyze as a single string
-    
-    num - int - number of features you would like to see. Defaults to all relevant words. 
-                If an integer greater than the number of words is passed, the entire word list is returned.
-                
-    Returns
-    -------
-    
-    A dataframe showing the words in order of importance
-    
-    '''
-    
-    vector = create_tf_vector(description)
-    words = genre_vectorizer.get_feature_names()
-    
-    df = pd.DataFrame(vector, columns = words).T
-    
-    df[df[0] > 0].sort_values(by=0, ascending=False)
-    
-    if (num == None) or (num >= len(df)):
-        return df
-    else:
-        return df.head(num)
