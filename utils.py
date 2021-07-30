@@ -196,12 +196,13 @@ class TextSet:
         '''
 
         words = ' '.join(self.text)
-
+        
+        # Uses the wordcloud package to build a wordcloud (removing stop words). Saves the word cloud as an attribute on the class
         self.wordcloud = WordCloud(width = 600, height = 600,
                         background_color ='white',
                         min_font_size = 10).generate(words)
 
-        # plot the WordCloud image                       
+        # plots the WordCloud image                       
         plt.figure(figsize = (6, 6), facecolor = None)
         plt.imshow(self.wordcloud)
         plt.axis("off")
@@ -230,9 +231,10 @@ class TextSet:
     
         data_concat = []
 
-        for tweet in self.tokens:
-            data_concat += tweet
+        for text in self.tokens:
+            data_concat += text
 
+        # Plots the frequency of the tokens after the tokens have been processed
         data_freqdist = FreqDist(data_concat)
 
         x = []
@@ -291,6 +293,7 @@ class TextSet:
             X_holdout = [' '.join(x) for x in self.X_holdout_tokens]
             
             # Default method is TF-IDF and this will vectorize holdout, test and train separately.
+            # Saves vectors as attributes and saves the vectorizer as an attribute for later transformations
             if method == 'tf_idf':
                 self.vectorizer = TfidfVectorizer(max_features=max_features,ngram_range=ngram_range)
                 self.X_train = self.vectorizer.fit_transform(X_train)
@@ -332,7 +335,7 @@ class TextSet:
         X_holdout_scaled: Array
             The scaled vector of X_holdout
         '''
-            
+        # This is really only used for neural nets.
         self.scaler = StandardScaler()
             
         self.X_train_scaled = self.scaler.fit_transform(self.X_train)
@@ -506,6 +509,7 @@ class ModelComparison:
                     'holdout_history': hold_val
                 }
         
+        # Runs the calc_scores method to populate scores for the train and test datasets
         if self.nn == False:
             self.calc_scores(data=set_list)
         else:
@@ -539,17 +543,19 @@ class ModelComparison:
         
         title = data_type.title()
         
+        # You can reduce which datasets you would like to see by selecting a list. If the default None is passed, all datasets will be used
         if data == None:
             set_list = self.data_list
-        
         else:
             set_list = data
         
+        # Uses the data_dict that was saved as an attribute when the fit_models method was called
+        # Selects holdout or test set based on parameters selected
         for dataset in set_list:
             
             y_train = self.data_dict[dataset.name]['y_train']
             y_train_preds = self.data_dict[dataset.name]['y_train_preds']
-        
+
             if data_type == 'test':
                 
                 y_val = self.data_dict[dataset.name]['y_test']
@@ -560,6 +566,8 @@ class ModelComparison:
                 y_val = self.data_dict[dataset.name]['y_holdout']
                 y_val_preds = self.data_dict[dataset.name]['y_holdout_preds']
             
+            # Creates a single dataframe comprising of the results for each dataset
+            # Multi-Label uses different metrics than other classification problems so it produces a very different table.
             if self.y_format != 'multi_label':
                 dictionary = {
                     'Accuracy': [accuracy_score(y_train, y_train_preds), accuracy_score(y_val, y_val_preds)],
@@ -585,8 +593,10 @@ class ModelComparison:
             self.data_dict[dataset.name][f'{data_type} scores'] = df
             df_list.append(df)
         
+        # Creates the all_scores attribute with both train and test/holdout scores
         self.all_scores = pd.concat(df_list, axis=1)
         
+        # Creates a dataframe with only test/holdout scores with the largest value in each row highlighted for swift comparison
         self.score_comparison = self.all_scores[[x for x in self.all_scores.columns if x.endswith(title)]]
         
         self.score_comparison = self.score_comparison.style.highlight_max(color='lightgreen', axis=1)
@@ -611,16 +621,18 @@ class ModelComparison:
 
         df_list = []
         
+        # selects the datasets requested in the parameters to compare
         if data == None:
             set_list = self.data_list
         
         else:
             set_list = data
 
+        # Creates a dataframe of scores for each dataset and highlights the top value in each row
         for dataset in set_list:
 
             hist = self.data_dict[dataset.name]['holdout_history']
-
+            
             dictionary = {
                 'Loss': hist[0],
                 'Accuracy': hist[1]
@@ -661,6 +673,7 @@ class ModelComparison:
         
         for dataset in set_list:
             
+            # Fits the model on each dataset again and then plots the confusion matrix for each dataset one by one
             X_train = dataset.X_train
             y_train = self.data_dict[dataset.name]['y_train']
             
@@ -710,7 +723,7 @@ class ModelComparison:
             set_list = self.data_list
         else:
             set_list = [self.ref_dict[name] for name in data]
-        
+        # Uses the dataset dictionary to pull the relevant scores for each dataset and then plots both train and test scores
         for dataset in set_list:
             if data_type == 'test':
                 y_val = self.data_dict[dataset.name]['y_test']
@@ -763,6 +776,7 @@ class ModelComparison:
         else:
             set_list = [self.ref_dict[name] for name in data]
         
+        # Plots the validation history for a neural network model using the data_dict attribute
         for dataset in set_list:
             history = self.data_dict[dataset.name]['model_history']
             fig, (ax1, ax2) = plt.subplots(nrows=1,ncols=2, figsize=(12, 4))
@@ -801,7 +815,7 @@ def find_genre(entry):
     split = entry.split("'")
 
     genres = []
-
+    
     for n in range(len(split)):
         if n%2==1:
             genres.append(split[n])
